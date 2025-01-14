@@ -1,0 +1,67 @@
+const fs = require('fs');
+const path = require('path');
+
+// Define the input and output folders
+const inputFolderPath = './src/AlliconsSVG';
+const outputFolderPath = './src/temp';
+
+// Ensure the output folder exists
+if (!fs.existsSync(outputFolderPath)) {
+  fs.mkdirSync(outputFolderPath, { recursive: true });
+}
+
+// Read the files in the input folder
+fs.readdir(inputFolderPath, (err, files) => {
+  if (err) {
+    console.error('Error reading the input folder:', err);
+    return;
+  }
+
+  files.forEach((file) => {
+    // Match the pattern in the filename
+    const match = file.match(/^Icons=(.*), Size=(\d+)px, Type=(.*)\.svg$/);
+    if (match) {
+      const iconName = match[1].replace(/ /g, ''); // Remove spaces
+      const size = match[2];
+      const fileType = match[3];
+
+      // Construct the new filename
+      let newFileName = fileType === 'Line' 
+        ? `${iconName}_${size}.svg` 
+        : `${iconName}_${fileType}_${size}.svg`;
+
+      // Define the full paths for renaming and moving the file
+      const oldFilePath = path.join(inputFolderPath, file);
+      const newFilePath = path.join(outputFolderPath, newFileName);
+
+      // Move and rename the file
+      fs.rename(oldFilePath, newFilePath, (renameErr) => {
+        if (renameErr) {
+          console.error(`Error moving and renaming file ${file}:`, renameErr);
+        } else {
+          console.log(`Moved and renamed: ${file} -> ${newFileName}`);
+        }
+      });
+    }
+  });
+});
+
+
+const fs = require('fs');
+const path = require('path');
+
+// Define the folder path
+const folderPath = './src/AlliconsSVG';
+
+// Read the contents of the folder
+fs.readdir(folderPath, (err, files) => {
+  if (err) {
+    console.error('Error reading the folder:', err);
+    return;
+  }
+
+  // Filter out directories and count only files
+  const fileCount = files.filter(file => fs.lstatSync(path.join(folderPath, file)).isFile()).length;
+
+  console.log(`The folder contains ${fileCount} file(s).`);
+});
